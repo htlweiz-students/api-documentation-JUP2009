@@ -4,17 +4,18 @@
 
 USAGE=$(cat << EOF
 usage: $(basename $0) [-v,--verbose] [-b,--branch <branchname>] [--vim] [-h,--help] [start|stop|restart|reload|log]
-  -h, --help                  show this help message and exit
-  -v, --verbose               provide a verbose output
-      --vim                   enable vim motions plugin
-  -b, --branch <branchname>   check and switch to branch <branchname>.
+  -h, --help                  Show this help message and exit
+  -v, --verbose               Provide a verbose output
+      --vim                   Enable vim motions plugin
+  -b, --branch <branchname>   Check and switch to branch <branchname>.
                               If a branch switch is detected, container will be stopped first
+  -a, --all                   Open all links, not only the first.
     commands:
-      start                   build and start container
-      stop                    stops container
-      restart                 restart container
-      reload                  lifereload changed containers
-      log                     show and follow logfiles
+      start                   Build and start container
+      stop                    Stops container
+      restart                 Restart container
+      reload                  Lifereload changed containers
+      log                     Show and follow logfiles
 EOF
 )
 
@@ -46,34 +47,45 @@ fail() {
 
 # Variables here 
 
-CMD=start
+CMD=""
+ARGS=""
 VIM="no"
 VERBOSE=0
 WORKDIR=$(cd $(dirname $0); pwd)
 cd ${WORKDIR}
 BRANCH=$(git branch --show-current)
 CHROMIUM_DIR=${TMP_USER}/container/
+ALL=no
 mkdir -p ${CHROMIUM_DIR}
 
 # Main 
 
 main() {
   while [ "$#" -ge 1 ]; do
+    log_debug looking for $1
     case "$1" in
       -v | --verbose)
         LOG_LEVEL=1
         log_debug Debugging enable
         shift
         ;;
+      -a | --all)
+        log_debug got all switch
+        ALL=yes
+        shift
+        ;; 
       -h | --help)
+        log_debug got help switch
         usage
         exit 0
         ;;
       --vim)
+        log_Debug got vim switch
         VIM="yes"
         shift
         ;;
       -b | --branch)
+        log_debug got branch switch
         if [ -z "$2" ]; then
           fail 2 $1 needs a branch name given
         else
@@ -83,30 +95,41 @@ main() {
         fi
         ;;
       *)
-        case "$1" in
-          start)
-            CMD=$1
-            ;;
-          stop)
-            CMD=$1
-            ;;
-          restart)
-            CMD=$1
-            ;;
-          reload)
-            CMD=$1
-            ;;
-          log)
-            CMD=$1
-            ;;
-          *)
-          fail 1 unknown parameter $1
-          ;;
-        esac
-        shift
+        log_debug "Looking for $1"
+        if [ -z "${CMD}" ]; then
+          case "$1" in
+            start)
+              CMD=$1
+              ;;
+            stop)
+              CMD=$1
+              ;;
+            restart)
+              CMD=$1
+              ;;
+            reload)
+              CMD=$1
+              ;;
+            log)
+              CMD=$1
+              ;;
+            *)
+              fail 1 unknown parameter $1
+              ;;
+          esac
+          shift
+        else
+          ARGS="${ARGS} $1"
+          shift
+        fi
         ;;
     esac
   done
+
+  log_debug CMD = ${CMD} ...
+  if [ -z "${CMD}" ]; then
+    CMD=start
+  fi
 
   log_info COMMAND: ${CMD}
   log_debug BRANCH: ${BRANCH}
@@ -158,15 +181,20 @@ stop_container() {
 }
 
 start_container() {
-  EXTENSION_FILE=./code/root/etc/s6-overlay/s6-rc.d/code-plugins/extensions.txt
   log_debug building build and start 
-  if [ "${VIM}" = "yes" ]; then
-    echo auiworks.amvim >> ${EXTENSION_FILE}
-  fi
+  for EXTENSION_FILE in $(find . -name extensions.txt); do 
+    if [ "${VIM}" = "yes" ]; then
+      echo auiworks.amvim >> ${EXTENSION_FILE}
+    fi
+  done
+  
   docker compose up --build -d
   log_debug is up, unpatching extension file
-  grep -v auiworks.amvim ${EXTENSION_FILE} > ${EXTENSION_FILE}.tmp 
-  mv ${EXTENSION_FILE}.tmp ${EXTENSION_FILE}
+  
+  for EXTENSION_FILE in $(find . -name extensions.txt); do 
+    grep -v auiworks.amvim ${EXTENSION_FILE} > ${EXTENSION_FILE}.tmp 
+    mv ${EXTENSION_FILE}.tmp ${EXTENSION_FILE}
+  done
   log_debug start finished
 }
 
@@ -184,30 +212,39 @@ switch_branch() {
 
 follow_logs() {
   log_debug following log files
-  docker compose logs --follow
+  docker compose logs --follow ${ARGS}
 }
 
 start_browser() {
-  url=$(head -n 1 url.txt | sed s/#.*//)
-  count=0
-  log_info Try opening url: ${url}
-  while ( ! curl ${url} >/dev/null 2>&1 || curl ${url} 2>&1 | grep 404 > /dev/null 2>&1); do
+  stop_browser
+  cat url.txt | while IFS= read -r raw_url; do
+    url=$(echo ${raw_url} | sed s/\ *#.*//)
+    [ -z "${url}" ] && continue
+    count=0
+    log_info Try opening url: ${raw_url}
+    while ( ! curl --retry 5 --retry-all-errors ${url} >/dev/null 2>&1 || curl ${url} 2>&1 | grep 404 > /dev/null 2>&1); do
+      sleep 1
+      echo -n . >&2
+      let count=count+1
+      if [ ${count} -gt 20 ] ; then
+        fail 30 noread: ${raw_url} 
+      fi
+      if [ ! ${RUNNING} ]; then
+        break
+      fi
+    done
     sleep 1
-    echo -n . >&2
-    let count=count+1
-    if [ ${count} -gt 20 ] ; then
-      fail 30 code server still not reachable
-    fi
-    if [ ! ${RUNNING} ]; then
+    chromium --user-data-dir=${CHROMIUM_DIR}/data --app=${url} >/dev/null 2>&1 &
+    [ -e ${CHROMIUM_DIR}/pid ] || echo $! > ${CHROMIUM_DIR}/pid
+    if [ "${ALL}" = "no" ]; then
       break
     fi
   done
-  chromium --user-data-dir=${CHROMIUM_DIR}/data --app=${url} >/dev/null 2>&1 &
-  echo $! > ${CHROMIUM_DIR}/pid
 }
 
 stop_browser() {
-  kill $(cat ${CHROMIUM_DIR}/pid)
+  [ -e ${CHROMIUM_DIR}/pid ] && kill $(cat ${CHROMIUM_DIR}/pid)
+  [ -e ${CHROMIUM_DIR}/pid ] && rm ${CHROMIUM_DIR}/pid
 }
 
 main $*
