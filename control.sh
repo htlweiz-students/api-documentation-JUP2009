@@ -80,7 +80,7 @@ main() {
         exit 0
         ;;
       --vim)
-        log_Debug got vim switch
+        log_debug got vim switch
         VIM="yes"
         shift
         ;;
@@ -138,6 +138,7 @@ main() {
   case ${CMD} in
     start)
       switch_branch
+      check_workspace
       start_container
       start_browser
       ;;
@@ -145,14 +146,17 @@ main() {
       stop_browser
       stop_container
       switch_branch
+      check_workspace
       ;;
     restart)
       stop_container
       switch_branch
+      check_workspace
       start_container
       ;;
     reload)
       switch_branch
+      check_workspace
       start_container
       ;;
     log)
@@ -198,13 +202,21 @@ start_container() {
   log_debug start finished
 }
 
+check_workspace() {
+  log_debug checking workspace
+  workspace_target=workspace_${BRANCH}
+  [ -e "${workspace_target}" ] || mkdir ${workspace_target}
+  current_workspace_target=$(readlink -f workspace)
+  if [ "${workspace_target}" != "${current_workspace_target}" ]; then
+    unlink workspace 
+    ln -s ${workspace_target} workspace
+  fi
+}
+
 switch_branch() {
   log_debug switching branch
   current_branch=$(git branch --show-current)
   if [ "${BRANCH}" != "${current_branch}" ]; then
-    unlink workspace
-    [ -e workspace_${BRANCH} ] || mkdir workspace_${BRANCH}
-    ln -s workspace_${BRANCH} workspace
     stop_container
     git checkout ${BRANCH} || fail 10 Switching branch failed
   fi

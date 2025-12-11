@@ -21,7 +21,7 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Vienna
-      - SUDO_PASSWORD=password #optional
+      - SUDO_PASSWORD=Kennwort1 #optional
       - DEFAULT_WORKSPACE=/workspace #optional
       - PORT=8443
     volumes:

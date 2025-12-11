@@ -1,2 +1,2 @@
-http://localhost/code/     # Code Server
 http://localhost/doc/      # The Documentation
+http://localhost/code/     # Code Server

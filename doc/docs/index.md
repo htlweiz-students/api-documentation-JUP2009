@@ -17,3 +17,7 @@ Es steht Ihnen frei, diese oder adäquate andere Komponenten direkt auf Ihrer Ha
 ## 2. [Verwaltung Code Server](02_codeserver.md)
 
 ## 3. [Workpackage Verwaltung](03_workpackage.md)
+
+## Links
+
+### <a href="../code/" target=_blank>Der Code editor</a>

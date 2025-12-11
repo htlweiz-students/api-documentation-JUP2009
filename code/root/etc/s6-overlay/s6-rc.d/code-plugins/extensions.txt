@@ -1,3 +1,4 @@
 blipk.csharp
 fernandoescolar.vscode-solution-explorer
 nromanov.dotrush
+k--kato.docomment
