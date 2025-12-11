@@ -1,4 +1,4 @@
-### Überblick über Exception Handling in C#
+### Überblick über Exception Handling in C\#
 
 Exception Handling in C# dient dazu, Fehler in Programmen zu behandeln, die außerhalb der normalen Programmausführung auftreten können (z. B. 
 Datei nicht gefunden, Null-Referenzzugriff, usw.). Die Hauptmechanismen sind:
