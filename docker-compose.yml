@@ -45,4 +45,7 @@ services:
       - "traefik.http.middlewares.doc-strip.stripprefix.prefixes=/doc"
       - "traefik.http.middlewares.doc-strip.stripprefix.forceSlash=false"
       - "traefik.http.routers.doc-router.middlewares=doc-strip"
-    
+      - "traefik.http.routers.doc-router-root.rule=Path(`/`)"
+      - "traefik.http.middlewares.root-redirect-root.redirectregex.regex=/$$"
+      - "traefik.http.middlewares.root-redirect-root.redirectregex.replacement=/doc/"
+      - "traefik.http.routers.doc-router-root.middlewares=root-redirect-root"
