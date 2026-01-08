@@ -36,4 +36,11 @@ public class Test1
             Assert.Equal(expected[i], calc.getElements()[i], precision: 4);
         }
     }
+    [Fact]
+    public void test_count_two(){
+        AverageCalculator calc = new AverageCalculator();
+        calc.add(2);
+        calc.add(456);
+        Assert.Equal(2, calc.count());
+    }
 }

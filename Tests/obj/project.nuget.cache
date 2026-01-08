@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "K3RcsE5SaNib6PIwFjkay+AGRcaw7TKspy8VdHSsOcJNtPLuYnhA1BZvZUkqygLNqe8lNlrJUPb+umv2o5Z9CA==",
+  "dgSpecHash": "z2JcSUWYjXdJZ4WNp5qiO1KzRukK+ctx1Kv+dZnExELj6OkLzpcoERtzLAU1CTb0bHywKJPM7P1aqWEI5LJY1Q==",
   "success": true,
-  "projectFilePath": "/config/workspace/api-documentation-JUP2009/Tests/Tests.csproj",
+  "projectFilePath": "/workspace/api-documentation-JUP2009/Tests/Tests.csproj",
   "expectedPackageFiles": [
     "/config/.nuget/packages/coverlet.collector/6.0.0/coverlet.collector.6.0.0.nupkg.sha512",
     "/config/.nuget/packages/microsoft.codecoverage/17.6.0/microsoft.codecoverage.17.6.0.nupkg.sha512",

@@ -1,4 +1,3 @@
-/config/workspace/api-documentation-JUP2009/average/bin/Debug/net8.0/average.deps.json
 /config/workspace/api-documentation-JUP2009/average/bin/Debug/net8.0/average.dll
 /config/workspace/api-documentation-JUP2009/average/bin/Debug/net8.0/average.pdb
 /config/workspace/api-documentation-JUP2009/average/obj/Debug/net8.0/average.GeneratedMSBuildEditorConfig.editorconfig
@@ -9,4 +8,3 @@
 /config/workspace/api-documentation-JUP2009/average/obj/Debug/net8.0/average.dll
 /config/workspace/api-documentation-JUP2009/average/obj/Debug/net8.0/refint/average.dll
 /config/workspace/api-documentation-JUP2009/average/obj/Debug/net8.0/average.pdb
-/config/workspace/api-documentation-JUP2009/average/obj/Debug/net8.0/ref/average.dll
