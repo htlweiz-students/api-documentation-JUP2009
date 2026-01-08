@@ -2,14 +2,15 @@
 
 public class AverageCalculator
 {
-    private double[] saved_doubles;
+    private double[] saved_doubles = {};
+
 
     /// <summary>
     /// adds a single double to the double array
     /// </summary>
     /// <param name="value">the value you want to add</param>
     public void add(double value){
-        saved_doubles[saved_doubles.Length] = value;
+        saved_doubles = saved_doubles.Append(value).ToArray();
     }
 
     /// <summary>
@@ -19,7 +20,7 @@ public class AverageCalculator
     public void add(double[] values){
         if(values.Length !>0){return;}
         foreach(double number in values){
-            saved_doubles[saved_doubles.Length] = number;
+            saved_doubles = saved_doubles.Append(number).ToArray();
         }
     }
 
@@ -44,5 +45,10 @@ public class AverageCalculator
 
     public int count(){
         return saved_doubles.Length;
+    }
+
+    public override string ToString()
+    {
+        return $"{saved_doubles[0]}";
     }
 }

@@ -97,3 +97,6 @@
 /config/workspace/api-documentation-JUP2009/Tests/obj/Debug/net8.0/Tests.pdb
 /config/workspace/api-documentation-JUP2009/Tests/obj/Debug/net8.0/Tests.genruntimeconfig.cache
 /config/workspace/api-documentation-JUP2009/Tests/obj/Debug/net8.0/ref/Tests.dll
+/config/workspace/api-documentation-JUP2009/Tests/bin/Debug/net8.0/CoverletSourceRootsMapping_Tests
+/config/workspace/api-documentation-JUP2009/Tests/bin/Debug/net8.0/average.dll
+/config/workspace/api-documentation-JUP2009/Tests/bin/Debug/net8.0/average.pdb
